@@ -1,0 +1,426 @@
+import React, { useState } from 'react';
+import { Home as HomeIcon, Compass, Scan, Bell, User, Hotel, Target, Award, Plane, ShoppingBag, MapPin, CalendarDays, Users, MessageSquare, Settings, Globe, Info, FileText, Lock, Trash2, HelpCircle, MessageSquareText, ChevronRight } from 'lucide-react';
+
+// Main App Component
+const App = () => {
+  const [activeTab, setActiveTab] = useState('home');
+  const [journeyPoints, setJourneyPoints] = useState(10000); // Initial points
+  const [scanAmount, setScanAmount] = useState('');
+  const [showTierBenefits, setShowTierBenefits] = useState(false);
+
+  // Sample data for Explore section
+  const destinations = [
+    { name: 'Sarinah Thamrin', description: 'Iconic retail and cultural hub.', category: 'retail', mapLink: 'https://maps.app.goo.gl/ABCDEF12345' },
+    { name: 'The Meru Sanur', description: 'Luxury beachfront resort in Bali.', category: 'hotels', mapLink: 'https://maps.app.goo.gl/GHIJKL67890' },
+    { name: 'Prambanan Temple', description: 'Ancient Hindu temple complex.', category: 'destinations', mapLink: 'https://maps.app.goo.gl/MNOPQR11223' },
+    { name: 'Soekarno-Hatta Airport Lounge', description: 'Comfortable pre-flight relaxation.', category: 'airports', mapLink: 'https://maps.app.goo.gl/STUVWX44556' },
+    { name: 'Borobudur Temple', description: 'Magnificent Buddhist temple.', category: 'destinations', mapLink: 'https://maps.app.goo.gl/YZABCD77889' },
+    { name: 'Taman Mini Indonesia Indah (TMII)', description: 'Cultural park showcasing Indonesian heritage.', category: 'destinations', mapLink: 'https://maps.app.goo.gl/EFGHIJ99001' },
+    { name: 'Bali Arts Festival', description: 'Annual cultural event in Bali.', category: 'events', mapLink: 'https://maps.app.goo.gl/KLMNOP22334' },
+  ];
+
+  const [filteredDestinations, setFilteredDestinations] = useState(destinations);
+  const [exploreCategory, setExploreCategory] = useState('all');
+
+  // Filter destinations based on category
+  const handleCategoryFilter = (category) => {
+    setExploreCategory(category);
+    if (category === 'all') {
+      setFilteredDestinations(destinations);
+    } else {
+      setFilteredDestinations(destinations.filter(d => d.category === category));
+    }
+  };
+
+  // Simulate QR/Receipt Scan for points
+  const convertToPoints = () => {
+    const amount = parseFloat(scanAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid amount.'); // Using alert for simplicity as per MVP, but typically would use a custom modal.
+      return;
+    }
+    const pointsEarned = Math.floor(amount / 100000); // Rp.100,000 = 1 point
+    setJourneyPoints(prevPoints => prevPoints + pointsEarned);
+    alert(`You earned ${pointsEarned} Journey Points! Total points: ${journeyPoints + pointsEarned}`); // Using alert
+    setScanAmount('');
+  };
+
+  // Common Card Component
+  const Card = ({ children, className = '' }) => (
+    <div className={`bg-white p-4 rounded-xl shadow-md ${className}`}>
+      {children}
+    </div>
+  );
+
+  // Section Header Component
+  const SectionHeader = ({ title, icon: Icon }) => (
+    <div className="flex items-center space-x-2 mb-4">
+      {Icon && <Icon className="text-indigo-600" size={24} />}
+      <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+    </div>
+  );
+
+  // Navigation Item Component
+  const NavItem = ({ icon: Icon, label, isActive, onClick }) => (
+    <button
+      onClick={onClick}
+      className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors duration-200 ${
+        isActive ? 'text-indigo-600 bg-indigo-50' : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-100'
+      }`}
+    >
+      <Icon size={24} />
+      <span className="text-xs mt-1">{label}</span>
+    </button>
+  );
+
+  // Render content based on active tab
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return (
+          <div className="p-4 md:p-6">
+            <SectionHeader title="Home" icon={HomeIcon} />
+
+            {/* Profile Dashboard */}
+            <Card className="mb-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-semibold">Welcome, Traveler!</h3>
+                <User size={24} />
+              </div>
+              <p className="text-sm">Membership Tier: <span className="font-bold">Gold</span></p>
+              <p className="text-2xl font-bold mt-2">{journeyPoints.toLocaleString()} Journey Points</p>
+            </Card>
+
+            {/* 2x2 Grid Navigation */}
+            <div className="grid grid-cols-2 gap-4">
+              <Card>
+                <div className="flex items-center mb-2">
+                  <Hotel size={20} className="text-blue-500 mr-2" />
+                  <h4 className="font-semibold text-gray-800">Hotel Booking</h4>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Hotel Name"
+                  className="w-full p-2 mb-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <input
+                  type="date"
+                  placeholder="Date"
+                  className="w-full p-2 mb-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <input
+                  type="number"
+                  placeholder="Number of People"
+                  min="1"
+                  className="w-full p-2 mb-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+                  Find Hotels
+                </button>
+              </Card>
+
+              <Card>
+                <div className="flex items-center mb-2">
+                  <Target size={20} className="text-green-500 mr-2" />
+                  <h4 className="font-semibold text-gray-800">Missions</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">Complete daily, weekly, and seasonal missions to earn points!</p>
+                <ul className="list-disc list-inside text-sm text-gray-700">
+                  <li>Daily Login Streak</li>
+                  <li>Visit an InJourney Destination</li>
+                  <li>Redeem a Reward</li>
+                </ul>
+                <button className="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors">
+                  View Missions
+                </button>
+              </Card>
+
+              <Card>
+                <div className="flex items-center mb-2">
+                  <Award size={20} className="text-yellow-500 mr-2" />
+                  <h4 className="font-semibold text-gray-800">Artifacts</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">Collect unique visual badges from your journeys!</p>
+                <ul className="list-disc list-inside text-sm text-gray-700">
+                  <li>Airport Explorer Badge</li>
+                  <li>Heritage Site Guardian</li>
+                  <li>Retail Enthusiast</li>
+                </ul>
+                <button className="w-full mt-4 bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-colors">
+                  My Collection
+                </button>
+              </Card>
+
+              <Card>
+                <div className="flex items-center mb-2">
+                  <MapPin size={20} className="text-red-500 mr-2" />
+                  <h4 className="font-semibold text-gray-800">Dream & Plan</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">Plan your next adventure with our itinerary builder.</p>
+                <ul className="list-disc list-inside text-sm text-gray-700">
+                  <li>Create custom itineraries</li>
+                  <li>Discover new places</li>
+                  <li>Share with friends</li>
+                </ul>
+                <button className="w-full mt-4 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors">
+                  Start Planning
+                </button>
+              </Card>
+            </div>
+          </div>
+        );
+
+      case 'explore':
+        return (
+          <div className="p-4 md:p-6">
+            <SectionHeader title="Explore" icon={Compass} />
+
+            {/* Category Filters */}
+            <div className="flex flex-wrap gap-2 mb-6 justify-center">
+              {['all', 'hotels', 'airports', 'retail', 'destinations', 'events'].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => handleCategoryFilter(cat)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200
+                    ${exploreCategory === cat ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                >
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* Map-style Interface (Grid of Destinations) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredDestinations.map((dest, index) => (
+                <Card key={index}>
+                  <h3 className="font-bold text-lg text-gray-800 mb-1">{dest.name}</h3>
+                  <p className="text-sm text-gray-600 h-10 overflow-hidden mb-3">{dest.description}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-indigo-500 capitalize">{dest.category}</span>
+                    <a
+                      href={dest.mapLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                      Open in Maps <ChevronRight size={16} className="ml-1" />
+                    </a>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'scan':
+        return (
+          <div className="p-4 md:p-6 flex flex-col items-center justify-center min-h-[calc(100vh-120px)]">
+            <SectionHeader title="Scan & Earn" icon={Scan} />
+            <Card className="w-full max-w-md text-center">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Convert Transactions to Points</h3>
+              <p className="text-gray-600 mb-6">Enter your transaction amount to earn Journey Points.</p>
+              <div className="mb-4">
+                <label htmlFor="scanAmount" className="sr-only">Transaction Amount (Rp)</label>
+                <input
+                  id="scanAmount"
+                  type="number"
+                  placeholder="e.g., 150000 (Rp. 100.000 = 1 point)"
+                  value={scanAmount}
+                  onChange={(e) => setScanAmount(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+              </div>
+              <button
+                onClick={convertToPoints}
+                className="w-full bg-indigo-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors shadow-lg"
+              >
+                Convert to Points
+              </button>
+            </Card>
+          </div>
+        );
+
+      case 'notification':
+        return (
+          <div className="p-4 md:p-6">
+            <SectionHeader title="Notifications" icon={Bell} />
+            <div className="space-y-4">
+              <Card>
+                <div className="flex items-center mb-2">
+                  <Bell size={20} className="text-purple-500 mr-2" />
+                  <h4 className="font-semibold text-gray-800">Vouchers & Benefits</h4>
+                </div>
+                <p className="text-sm text-gray-600">You have new exclusive vouchers waiting for you! Check them out now.</p>
+                <button className="mt-2 text-purple-600 text-sm font-medium hover:underline">View Vouchers</button>
+              </Card>
+              <Card>
+                <div className="flex items-center mb-2">
+                  <CalendarDays size={20} className="text-teal-500 mr-2" />
+                  <h4 className="font-semibold text-gray-800">Transaction Information</h4>
+                </div>
+                <p className="text-sm text-gray-600">Your recent transaction at Sarinah Thamrin has earned you 5 Journey Points.</p>
+                <button className="mt-2 text-teal-600 text-sm font-medium hover:underline">View Details</button>
+              </Card>
+              <Card>
+                <div className="flex items-center mb-2">
+                  <Info size={20} className="text-orange-500 mr-2" />
+                  <h4 className="font-semibold text-gray-800">InJourney Information</h4>
+                </div>
+                <p className="text-sm text-gray-600">Exciting new destinations and events are coming soon to InJourney Rewards!</p>
+                <button className="mt-2 text-orange-600 text-sm font-medium hover:underline">Read More</button>
+              </Card>
+            </div>
+          </div>
+        );
+
+      case 'profile':
+        return (
+          <div className="p-4 md:p-6">
+            <SectionHeader title="My Profile" icon={User} />
+
+            {/* Profile Details */}
+            <Card className="mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="text-lg font-semibold">John Doe</h3>
+                  <p className="text-sm">Membership Tier: <span className="font-bold">Gold</span></p>
+                </div>
+                <User size={28} />
+              </div>
+              <p className="text-3xl font-bold mt-2">{journeyPoints.toLocaleString()} Journey Points</p>
+              <button
+                onClick={() => setShowTierBenefits(!showTierBenefits)}
+                className="mt-4 w-full bg-white bg-opacity-20 text-white py-2 rounded-md hover:bg-opacity-30 transition-colors"
+              >
+                View Tier Benefits
+              </button>
+              {showTierBenefits && (
+                <div className="mt-4 p-3 bg-white bg-opacity-30 rounded-md">
+                  <p className="text-sm">Gold Tier Benefits include:</p>
+                  <ul className="list-disc list-inside text-xs">
+                    <li>Exclusive lounge access</li>
+                    <li>Priority hotel check-in</li>
+                    <li>Bonus points on all transactions</li>
+                  </ul>
+                </div>
+              )}
+            </Card>
+
+            {/* Rewards Catalog */}
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Rewards Catalog</h3>
+            <Card className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold text-gray-800">My Rewards</h4>
+                <ChevronRight size={20} className="text-gray-500" />
+              </div>
+              <p className="text-sm text-gray-600">No rewards redeemed yet. Start exploring!</p>
+            </Card>
+            <div className="flex flex-wrap justify-around gap-2 mb-6">
+              {[
+                { label: 'Airport', icon: Plane },
+                { label: 'Hotel', icon: Hotel },
+                { label: 'Destination', icon: MapPin },
+                { label: 'Events', icon: CalendarDays },
+                { label: 'Retail', icon: ShoppingBag },
+              ].map((cat, index) => (
+                <div key={index} className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                  <cat.icon size={28} className="text-indigo-600 mb-1" />
+                  <span className="text-xs text-gray-700">{cat.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* For More Value */}
+            <h3 className="text-xl font-bold text-gray-800 mb-4">For More Value</h3>
+            <div className="space-y-3 mb-6">
+              <Card className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Target size={20} className="text-green-500 mr-2" />
+                  <h4 className="font-semibold text-gray-800">Missions</h4>
+                </div>
+                <ChevronRight size={20} className="text-gray-500" />
+              </Card>
+              <Card className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Award size={20} className="text-yellow-500 mr-2" />
+                  <h4 className="font-semibold text-gray-800">Artifacts</h4>
+                </div>
+                <ChevronRight size={20} className="text-gray-500" />
+              </Card>
+            </div>
+
+            {/* General Information */}
+            <h3 className="text-xl font-bold text-gray-800 mb-4">General Information</h3>
+            <div className="space-y-3 mb-6">
+              {[
+                { label: 'Activities', icon: CalendarDays },
+                { label: 'Settings', icon: Settings },
+                { label: 'Language', icon: Globe },
+                { label: 'About Us', icon: Info },
+                { label: 'Terms & Conditions', icon: FileText },
+                { label: 'Privacy Settings', icon: Lock },
+                { label: 'Delete Account', icon: Trash2, color: 'text-red-500' },
+              ].map((item, index) => (
+                <Card key={index} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center">
+                    <item.icon size={20} className={`${item.color || 'text-gray-600'} mr-2`} />
+                    <span className={`font-medium ${item.color || 'text-gray-800'}`}>{item.label}</span>
+                  </div>
+                  <ChevronRight size={20} className="text-gray-500" />
+                </Card>
+              ))}
+            </div>
+
+            {/* Help */}
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Help</h3>
+            <div className="space-y-3">
+              <Card className="flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors">
+                <div className="flex items-center">
+                  <HelpCircle size={20} className="text-blue-500 mr-2" />
+                  <span className="font-medium text-gray-800">Help Centre</span>
+                </div>
+                <ChevronRight size={20} className="text-gray-500" />
+              </Card>
+              <Card className="flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors">
+                <div className="flex items-center">
+                  <MessageSquareText size={20} className="text-blue-500 mr-2" />
+                  <span className="font-medium text-gray-800">Share Feedback</span>
+                </div>
+                <ChevronRight size={20} className="text-gray-500" />
+              </Card>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 font-sans antialiased flex flex-col">
+      {/* Header */}
+      <header className="bg-white shadow-sm p-4 sticky top-0 z-10">
+        <h1 className="text-2xl font-bold text-indigo-700 text-center">InJourney Rewards</h1>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-grow pb-20"> {/* pb-20 to make space for fixed bottom nav */}
+        {renderContent()}
+      </main>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-20">
+        <div className="flex justify-around h-16">
+          <NavItem icon={HomeIcon} label="Home" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} />
+          <NavItem icon={Compass} label="Explore" isActive={activeTab === 'explore'} onClick={() => setActiveTab('explore')} />
+          <NavItem icon={Scan} label="Scan" isActive={activeTab === 'scan'} onClick={() => setActiveTab('scan')} />
+          <NavItem icon={Bell} label="Notify" isActive={activeTab === 'notification'} onClick={() => setActiveTab('notification')} />
+          <NavItem icon={User} label="Profile" isActive={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+export default App;
